@@ -2,6 +2,21 @@
 import re
 import os
 from urllib.parse import parse_qs, unquote
+from pathlib import Path
+
+
+def get_secrets_path() -> Path:
+    """
+    获取secrets目录的路径
+    
+    Returns:
+        Path: secrets目录的Path对象
+    """
+    script_dir = Path(__file__).parent
+    secrets_dir = script_dir.parent / "secrets"
+    secrets_dir.mkdir(exist_ok=True)  # 确保目录存在
+    return secrets_dir
+
 
 def parse_curl_command(filepath=None) -> dict | None:
     """
