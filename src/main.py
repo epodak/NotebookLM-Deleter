@@ -1,55 +1,48 @@
-# src/main.py (Phiên bản sử dụng Context Manager)
-
-from src.curl_parser import parse_curl_command
-from src.nbs_extractor import extract_notebooks
-from src.cli import select_nbs_to_delete
-from src.client import NotebookLMClient
-
-
-def run_app(client: NotebookLMClient):
-    """
-    Hàm chứa logic chính của ứng dụng, nhận vào một client đã được khởi tạo.
-    """
-    # 1. Fetch & Extract
-    response_text = client.get_all_notebooks()
-    if response_text == None:
-        return
-    if '"e",4,null,null,143' in response_text:
-        print("Có lỗi khi lấy danh sách từ server")
-        print("at token đã hết hạn, làm ơn cập nhật lại curl_command.txt")
-        print(f"response_text: {response_text}")
-        return
-
-    notebooks = extract_notebooks(response_text)
-    if not notebooks:
-        print("Không có notebook nào để xóa!")
-        return
-
-    # 2. Interact (CLI)
-    notebooks_to_delete = select_nbs_to_delete(notebooks)
-    if not notebooks_to_delete:
-        print("Không có notebook nào được chọn. Kết thúc chương trình.")
-        return
-
-    # 3. Execute
-    client.delete_multiple_notebooks(notebooks_to_delete)
-
+# src/main.py
+from .client import NotebookLMClient
+from .nbs_extractor import extract_notebooks
+from .cli import select_nbs_to_delete
+from .curl_parser import parse_curl_command
 
 def main():
-    """Hàm chính: chỉ chịu trách nhiệm thiết lập và dọn dẹp."""
+    """
+    The main function of the application.
+    Orchestrates the process of fetching, selecting, and deleting notebooks.
+    """
+    print("🚀 NotebookLM Deleter - Simple & Reliable")
+    print("=" * 50)
 
-    print("Đang đọc và phân tích file 'curl_command.txt'...")
-    curl_data = parse_curl_command(filepath="secrets/curl_command.txt")
+    # Parse cURL command for authentication
+    print("📝 Reading authentication data...")
+    curl_data = parse_curl_command("secrets/curl_command.txt")
     if not curl_data:
         return
 
-    # Sử dụng `with` để tự động quản lý vòng đời của client
-    # try:
-    with NotebookLMClient(curl_data) as client:
-        run_app(client)
-    # except Exception as e:
-    # print(f"\nĐã xảy ra lỗi không mong muốn trong quá trình chạy: {e}")
+    try:
+        with NotebookLMClient(curl_data) as client:
+            # 1. Fetch all notebooks
+            response_text = client.get_all_notebooks()
+            if not response_text:
+                print("❌ Could not retrieve notebooks. Exiting.")
+                return
 
+            # 2. Extract notebook data from the response
+            all_notebooks = extract_notebooks(response_text)
+            if not all_notebooks:
+                print("❌ No notebooks found or failed to parse the list. Exiting.")
+                return
+
+            # 3. Let the user select which notebooks to delete
+            notebooks_to_delete = select_nbs_to_delete(all_notebooks)
+            if not notebooks_to_delete:
+                print("ℹ️  No notebooks selected for deletion. Exiting.")
+                return
+
+            # 4. Execute the deletion
+            client.delete_multiple_notebooks(notebooks_to_delete)
+
+    except Exception as e:
+        print(f"\n❌ An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
     main()

@@ -1,19 +1,22 @@
 def select_nbs_to_delete(notebooks: list[dict[str, str]]) -> list[dict[str, str]]:
     """
-    Giao tiếp với người dùng qua dòng lệnh CLI.
-    Từ danh sách các notebooks hiện có dạng [{title: title, id: id}, ...].
-    Trả về danh sách các nb cần xóa (tập hợp con của danh sách vào) [{title: title, id:id}, ...]
+    Interacts with the user via the command line to select notebooks for deletion.
+    Takes a list of notebooks and returns a list of notebooks to be deleted.
     """
-    print("\n--- DANH SÁCH NOTEBOOKS HIỆN CÓ ---")
+    if not notebooks:
+        print("No notebooks found.")
+        return []
+        
+    print("\n--- AVAILABLE NOTEBOOKS ---")
     for i, nb in enumerate(notebooks):
         print(f"{i+1:2d}: {nb['title']} (ID: {nb['id']})")
 
-    print("\nNhập số thứ tự của các notebooks bạn muốn xóa (ví dụ: 1, 3, 5-8):")
+    print("\nEnter the numbers of the notebooks you want to delete (e.g., 1, 3, 5-8):")
 
     try:
         user_input = input("> ")
         if not user_input:
-            print("Không chọn notebook nào. Kết thúc.")
+            print("No notebooks selected. Exiting.")
             return []
 
         selected_indices = set()
@@ -33,25 +36,25 @@ def select_nbs_to_delete(notebooks: list[dict[str, str]]) -> list[dict[str, str]
         ]
 
         if not notebooks_to_delete:
-            print("Lựa chọn không hợp lệ. Kết thúc.")
+            print("Invalid selection. Exiting.")
             return []
 
-        print("\nBẠN SẼ XÓA VĨNH VIỄN CÁC NOTEBOOKS SAU:")
+        print("\nTHE FOLLOWING NOTEBOOKS WILL BE PERMANENTLY DELETED:")
         for nb in notebooks_to_delete:
             print(f"  - {nb['title']}")
 
-        confirm = input("Bạn có chắc chắn không? (nhập 'y' để xác nhận): ")
+        confirm = input("Are you sure? (type 'y' to confirm): ")
         if confirm.lower() != "y":
-            print("Hành động đã được hủy.")
-            return[]
+            print("Action cancelled.")
+            return []
         
         return notebooks_to_delete
 
     except (ValueError, IndexError):
-        print("Lỗi: Input không hợp lệ. Vui lòng chỉ nhập số và theo đúng định dạng.")
+        print("Error: Invalid input. Please enter numbers in the correct format.")
         return []
     except Exception as e:
-        print(f"Đã xảy ra lỗi không mong muốn: {e}")
+        print(f"An unexpected error occurred: {e}")
         return []
     
 if __name__ == "__main__":

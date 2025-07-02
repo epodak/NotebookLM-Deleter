@@ -1,52 +1,65 @@
-# curl_parser.py
+# curl_parser.py - Simplified and user-friendly version
 import re
 from urllib.parse import parse_qs, unquote
 
-def parse_curl_command(filepath="curl_command.txt") -> dict | None:
+def parse_curl_command(filepath="secrets/curl_command.txt") -> dict | None:
     """
-    Đọc và phân tích một lệnh cURL từ file để trích xuất các thành phần.
+    Reads and parses a cURL command to extract authentication components.
     """
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             curl_string = f.read().replace('\\\n', ' ').strip()
     except FileNotFoundError:
-        print(f"Lỗi: Không tìm thấy file '{filepath}'.")
-        print("Vui lòng tạo file này và dán lệnh cURL vào đó.")
+        print(f"\n❌ Error: Could not find '{filepath}'.")
+        print("\n📋 QUICK SETUP REQUIRED:")
+        print("1. Open NotebookLM in your browser and log in")
+        print("2. Press F12 to open Developer Tools")
+        print("3. Go to the 'Network' tab")
+        print("4. Reload the page (Ctrl+R)")
+        print("5. Look for a request to 'notebook/model'")
+        print("6. Right-click it → Copy → Copy as cURL")
+        print("7. Create a file called 'secrets/curl_command.txt' and paste the command there")
+        print(f"8. Run this script again")
         return None
 
-    # Trích xuất URL
-    url_match = re.search(r"curl '(.*?)'", curl_string)
+    # Extract URL
+    url_match = re.search(r"curl ['\"]([^'\"]+)['\"]", curl_string)
     if not url_match:
-        print("Lỗi: Không thể tìm thấy URL trong lệnh cURL.")
+        print("❌ Error: Could not find URL in cURL command.")
         return None
     url = url_match.group(1)
 
-    # Trích xuất Headers
-    headers_matches = re.findall(r"-H '(.*?)'", curl_string)
-    headers = {key.strip(): value.strip() for key, value in (h.split(':', 1) for h in headers_matches)}
+    # Extract Headers
+    headers_matches = re.findall(r"-H ['\"]([^'\"]+)['\"]", curl_string)
+    headers = {}
+    for h in headers_matches:
+        if ':' in h:
+            key, value = h.split(':', 1)
+            headers[key.strip()] = value.strip()
 
-    # Trích xuất Cookie
-    cookie_match = re.search(r"--cookie '(.*?)'", curl_string) or re.search(r"-b '(.*?)'", curl_string)
+    # Extract Cookie
+    cookie_match = re.search(r"--cookie ['\"]([^'\"]+)['\"]", curl_string) or re.search(r"-b ['\"]([^'\"]+)['\"]", curl_string)
     cookie = cookie_match.group(1) if cookie_match else ""
     
-    # Trích xuất Data Raw và phân tích nó
-    data_raw_match = re.search(r"--data-raw '(.*?)'", curl_string)
+    # Extract Data and parse payload
+    data_raw_match = re.search(r"--data-raw ['\"]([^'\"]+)['\"]", curl_string)
     if not data_raw_match:
-        print("Lỗi: Không thể tìm thấy payload (--data-raw) trong lệnh cURL.")
+        print("❌ Error: Could not find payload (--data-raw) in cURL command.")
+        print("💡 Make sure you copied the request that contains notebook data.")
         return None
     
     data_raw_string = data_raw_match.group(1)
-    # Phân tích chuỗi query của payload để lấy ra 'f.req' và 'at'
     parsed_payload = parse_qs(data_raw_string)
     
-    # Lấy giá trị, unquote nếu cần, và lấy phần tử đầu tiên vì parse_qs trả về list
     f_req = unquote(parsed_payload.get('f.req', [''])[0])
     at_token = unquote(parsed_payload.get('at', [''])[0])
 
     if not all([url, headers, cookie, f_req, at_token]):
-        print("Lỗi: Không thể trích xuất đủ thông tin từ lệnh cURL.")
+        print("❌ Error: Could not extract sufficient information from cURL command.")
+        print("💡 Please ensure you copied the correct network request.")
         return None
 
+    print("✅ Successfully parsed cURL command!")
     return {
         "url": url,
         "headers": headers,
@@ -55,4 +68,4 @@ def parse_curl_command(filepath="curl_command.txt") -> dict | None:
             'f.req': f_req,
             'at': at_token
         }
-    }
+    } 

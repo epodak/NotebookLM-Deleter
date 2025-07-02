@@ -1,17 +1,38 @@
-# Môi trường ảo Python
-venv/
+# Authentication secrets
+secrets/
+auth_config.json
 
-# Thư mục cache của Python
+# Browser automation artifacts
+script_browser_profile/
+
+# Python cache
 __pycache__/
 *.pyc
-.mypy_cache
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
 
 # Thư mục chứa các file nháp
 scratchpad/
 
-# Các file cấu hình của IDE
-.vscode/
-.idea/
-
-# Thư mục chứa các file bí mật
-secrets/
+# Personal project memory file
+G-MEMORY.md
