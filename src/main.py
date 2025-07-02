@@ -3,39 +3,57 @@
 NotebookLM Deleter & Creator - 批量管理NotebookLM笔记本
 """
 
+import os
+import sys
 from .curl_parser import parse_curl_command
 from .client import NotebookLMClient
-from .cli import display_welcome, select_nbs_to_delete
+from .cli import select_nbs_to_delete
 from .creator import create_notebook_interactive
+from .uploader import upload_file_to_notebook_interactive
 from .nbs_extractor import extract_notebooks
-
 
 def main():
     """主程序入口"""
-    display_welcome()
-    
-    # 显示操作选项
-    print("🎯 Choose an operation:")
-    print("1. 📝 Create new notebook")
-    print("2. 🗑️  Delete existing notebooks")
-    print("3. ❌ Exit")
-    
-    choice = input("\nEnter your choice (1-3): ").strip()
-    
-    if choice == "1":
-        # 创建新笔记本
-        create_notebook_interactive()
-        return
-    elif choice == "2":
-        # 删除笔记本（原有功能）
-        delete_notebooks()
-        return
-    elif choice == "3":
-        print("👋 Goodbye!")
-        return
-    else:
-        print("❌ Invalid choice. Please enter 1, 2, or 3.")
-        return
+    try:
+        while True:
+            print("\n🤖 NotebookLM 管理工具")
+            print("=" * 40)
+            print("1. 📝 创建新笔记本")
+            print("2. 🗑️  删除笔记本")
+            print("3. 📁 上传文档到笔记本")
+            print("4. 🚪 退出")
+            print("=" * 40)
+            
+            choice = input("请选择操作 (1-4): ").strip()
+            
+            if choice == "1":
+                print("\n" + "="*50)
+                create_notebook_interactive()
+                print("="*50)
+                
+            elif choice == "2":
+                print("\n" + "="*50)
+                delete_notebooks()
+                print("="*50)
+                
+            elif choice == "3":
+                print("\n" + "="*50)
+                upload_file_to_notebook_interactive()
+                print("="*50)
+                
+            elif choice == "4":
+                print("👋 再见！")
+                sys.exit(0)
+                
+            else:
+                print("❌ 无效选择，请重新输入")
+                
+    except KeyboardInterrupt:
+        print("\n\n👋 用户取消操作，再见！")
+        sys.exit(0)
+    except Exception as e:
+        print(f"❌ 程序运行出错: {e}")
+        sys.exit(1)
 
 
 def delete_notebooks():
