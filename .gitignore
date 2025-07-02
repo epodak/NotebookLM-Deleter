@@ -1,0 +1,17 @@
+# Môi trường ảo Python
+venv/
+
+# Thư mục cache của Python
+__pycache__/
+*.pyc
+.mypy_cache
+
+# Thư mục chứa các file nháp
+scratchpad/
+
+# Các file cấu hình của IDE
+.vscode/
+.idea/
+
+# Thư mục chứa các file bí mật
+secrets/

@@ -1,0 +1,15 @@
+curl 'https://notebooklm.google.com/_/LabsTailwindUi/data/batchexecute?rpcids=wXbhsf&source-path=%2F&bl=boq_labs-tailwind-frontend_20250625.08_p0&f.sid=-1231804675555531382&hl=en&_reqid=101&rt=c' \
+  -H 'accept: */*' \
+  -H 'accept-language: en-US,en;q=0.5' \
+  -H 'content-type: application/x-www-form-urlencoded;charset=UTF-8' \
+  -b 'SID=g.a000DEAD-BEEB' \
+  -H 'origin: https://notebooklm.google.com' \
+  -H 'priority: u=1, i' \
+  -H 'referer: https://notebooklm.google.com/' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-gpc: 1' \
+  -H 'user-agent: My Agent' \
+  -H 'x-same-domain: 1' \
+  --data-raw 'f.req=%5B%5B%5B%22wXbhsf%22%2C%22%5Bnull%2C1%2Cnull%2C%5B2%5D%5D%22%2Cnull%2C%22generic%22%5D%5D%5D&at=DEADbeebfCHzvYjqLDRiJgBRg7xU%3A1231017994689&'
