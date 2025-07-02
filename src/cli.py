@@ -1,3 +1,14 @@
+"""
+Command Line Interface utilities for NotebookLM Deleter
+"""
+
+
+def display_welcome():
+    """显示欢迎信息"""
+    print("🚀 NotebookLM Manager - Create & Delete")
+    print("=" * 50)
+
+
 def select_nbs_to_delete(notebooks: list[dict[str, str]]) -> list[dict[str, str]]:
     """
     Interacts with the user via the command line to select notebooks for deletion.

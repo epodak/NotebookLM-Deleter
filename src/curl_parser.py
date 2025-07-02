@@ -1,11 +1,19 @@
 # curl_parser.py - Simplified and user-friendly version
 import re
+import os
 from urllib.parse import parse_qs, unquote
 
-def parse_curl_command(filepath="secrets/curl_command.txt") -> dict | None:
+def parse_curl_command(filepath=None) -> dict | None:
     """
     Reads and parses a cURL command to extract authentication components.
     """
+    if filepath is None:
+        # 使用相对于当前脚本文件的路径
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        secrets_dir = os.path.join(script_dir, "..", "secrets")
+        filepath = os.path.join(secrets_dir, "curl_command.txt")
+        filepath = os.path.normpath(filepath)  # 规范化路径
+    
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             curl_string = f.read().replace('\\\n', ' ').strip()
@@ -18,7 +26,7 @@ def parse_curl_command(filepath="secrets/curl_command.txt") -> dict | None:
         print("4. Reload the page (Ctrl+R)")
         print("5. Look for a request to 'notebook/model'")
         print("6. Right-click it → Copy → Copy as cURL")
-        print("7. Create a file called 'secrets/curl_command.txt' and paste the command there")
+        print("7. Create a file called 'dev/secrets/curl_command.txt' and paste the command there")
         print(f"8. Run this script again")
         return None
 
